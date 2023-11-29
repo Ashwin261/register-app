@@ -7,8 +7,7 @@ pipeline {
     environment {
 	    APP_NAME = "register-app-pipeline"
             RELEASE = "1.0.0"
-            DOCKER_USER = "dockerhub-jenkins-token"
-            DOCKER_PASS = 'dckr_pat_N0ZuAEMeS-w77b5X2OkQNBmxTaE'
+	    DOCKER_CREDENTIALS = credentials('dockerhub-jenkins-token')
             IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
             IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
     }
@@ -53,10 +52,11 @@ pipeline {
 	 stage("Build & Push Docker Image") {
             steps {
                 script {
-                    docker.withRegistry('',DOCKER_PASS) {
+                    docker.withRegistry('', "${DOCKER_CREDENTIALS}") {
                         docker_image = docker.build "${IMAGE_NAME}"
                     }
-                    docker.withRegistry('',DOCKER_PASS) {
+			
+                    docker.withRegistry('', "${DOCKER_CREDENTIALS}") {
                         docker_image.push("${IMAGE_TAG}")
                         docker_image.push('latest')
                     }
